@@ -1,6 +1,6 @@
 "use client"
 
-import { signIn } from "next-auth/react"
+import { getSession, signIn } from "next-auth/react"
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -22,7 +22,16 @@ export default function SignIn()
 
         if(!result?.error)
         {
-            router.push("/tech_home");
+            const session = await getSession();
+
+            if (session?.user?.role === "admin") 
+            {
+                router.push("/admin_home");
+            }
+            else
+            {
+                router.push("/tech_home");
+            }
         }
 
         else
@@ -35,7 +44,7 @@ export default function SignIn()
     
     return (
         <>
-            <input type="email" placeholder="Email technicien" onChange={(e) => setEmail(e.target.value)} />
+            <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
             <input type="password" placeholder="********" onChange={(e) => setPassword(e.target.value)} />
             <button onClick={handleSignin}>Valider</button>
 

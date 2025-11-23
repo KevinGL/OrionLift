@@ -17,7 +17,14 @@ export async function middleware(req: NextRequest)
     // Si user connecté et essaie d'aller sur /login → redirection vers dashboard
     if (isAuth && isAuthPage)
     {
-        return NextResponse.redirect(new URL("/tech_home", req.url));
+        if(token.role === "admin")
+        {
+          return NextResponse.redirect(new URL("/admin_home", req.url));
+        }
+        else
+        {
+          return NextResponse.redirect(new URL("/tech_home", req.url));
+        }
     }
 
     return NextResponse.next();
