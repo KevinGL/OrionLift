@@ -9,6 +9,8 @@ export async function main()
     await prisma.device.deleteMany();
     await prisma.user.deleteMany();
     await prisma.sector.deleteMany();
+    await prisma.maintenance.deleteMany();
+    await prisma.breakdown.deleteMany();
 
     let sectors = [];
     
@@ -54,6 +56,8 @@ export async function main()
 
     ////////////////////////////////////////
 
+    const devices: any[] = [];
+
     sectors.map(async (sector) =>
     {
         const minDevices = 80;
@@ -62,25 +66,93 @@ export async function main()
 
         for(let i = 0 ; i < nbDevices ; i++)
         {
-            const prefixes: string[] = [ "DA", "SA", "TA", "OA", "KA"];
+            const prefixes: string[] = ["AA", "DA", "SA", "TA", "OA", "KA"];
             
             const ref: string = prefixes[Math.floor(Math.random() * prefixes.length)] + faker.string.numeric(5);
+
+            const device =
+            {
+                ref,
+                createdAt: faker.date.between({
+                    from: new Date(2020, 0, 1),
+                    to: new Date(2024, 11, 31)
+                }),
+                address: faker.location.streetAddress(),
+                zipCode: faker.location.zipCode(),
+                city: faker.location.city(),
+                sector: { connect: { id: sector.id } }
+            }
+
+            devices.push(device);
             
             await prisma.device.create({
-                data: {
-                    ref,
-                    createdAt: faker.date.between({
-                        from: new Date(2020, 0, 1),
-                        to: new Date(2024, 11, 31)
-                    }),
-                    address: faker.location.streetAddress(),
-                    zipCode: faker.location.zipCode(),
-                    city: faker.location.city(),
-                    sector: { connect: { id: sector.id } }
-                }
+                data: device
             });
         }
     });
+
+    ////////////////////////////////////////
+
+    /*devices.map(async (device) =>
+    {
+        const date: Date = new Date();
+
+        date.setFullYear(2024);
+        date.setDate(Math.floor(Math.random() * 27) + 1);
+        date.setMonth(Math.floor(Math.random() * 11) + 1);
+        date.setHours(Math.floor(Math.random() * 8) + 9);
+        date.setMinutes(Math.floor(Math.random() * 60));
+        date.setSeconds(Math.floor(Math.random() * 60));
+
+        const beginAt: Date = new Date();
+        beginAt.setTime(date.getDate() - 30 * 60 * 1000);
+
+        const phoneAt: Date = new Date();
+        phoneAt.setTime(date.getDate() - 15 * 60 * 1000);
+
+        while(1)
+        {
+            await prisma.maintenance.create({
+                data: {
+                    device: { connect: { id: device.id } },
+                    user: { connect: { id: device.sector.user.id } },
+                    beginAt,
+                    endAt: date,
+                    phoneAt,
+                    phoneOK: Math.random() > 0.5 ? true : false,
+                    phoneText: faker.lorem.sentence(),
+                    briefing: faker.lorem.sentence(),
+                    safetyAt: date,
+                    safety: Math.random() > 0.5 ? "" : faker.lorem.sentence(),
+                    wiresAt: date,
+                    wires: Math.random() > 0.5 ? "" : faker.lorem.sentence()
+                }
+            });
+
+            const gap: number = Math.floor(5 * Math.random() - 2);
+
+            date.setTime(date.getTime() + 6 * 7 * 24 * 3600 * 1000 + gap * 24 * 3600 * 1000);
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////
+
+        const nbBreakdowns: number = Math.floor(Math.random() * 14) + 1;
+        
+        for(let i = 0 ; i < nbBreakdowns ; i++)
+        {
+            const duration: number = Math.floor(Math.random() * 30) + 30;
+            beginAt.setTime(date.getDate() - duration * 60 * 1000);
+            
+            await prisma.breakdown.create({
+                data: {
+                    device: { connect: { id: device.id } },
+                    user: { connect: { id: device.sector.user.id } },
+                    beginAt,
+                    endAt: date
+                }
+            });
+        }
+    });*/
 
     console.log("✅ Seed OK");
 }

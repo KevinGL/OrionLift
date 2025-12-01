@@ -23,22 +23,57 @@ model User {
   password    String
   sectorId    Int?  @unique
   sector      Sector?      @relation(fields: [sectorId], references: [id])
+  maintenances    Maintenance[]
+  breakdowns      Breakdown[]
 }
 
 model Device {
-  id          Int     @id @default(autoincrement())
-  ref         String
-  createdAt   DateTime @db.Date
-  address     String
-  zipCode     String
-  city        String
-  sectorId    Int
-  sector      Sector      @relation(fields: [sectorId], references: [id])
+  id              Int     @id @default(autoincrement())
+  ref             String
+  createdAt       DateTime @db.Date
+  address         String
+  zipCode         String
+  city            String
+  sectorId        Int
+  sector          Sector      @relation(fields: [sectorId], references: [id])
+  maintenances    Maintenance[]
+  breakdowns      Breakdown[]
 }
 
 model Sector {
   id          Int     @id @default(autoincrement())
   ref         String
   devices     Device[]
-  User        User?
+  user        User?
+}
+
+model Maintenance {
+  id          Int     @id @default(autoincrement())
+  deviceId    Int
+  device      Device      @relation(fields: [deviceId], references: [id])
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  beginAt     DateTime @db.Date
+  endAt       DateTime @db.Date
+  phoneAt     DateTime @db.Date
+  phoneOK     Boolean
+  phoneText   String
+  briefing    String
+  safetyAt    DateTime @db.Date
+  safety      String
+  wiresAt     DateTime @db.Date
+  wires       String
+}
+
+model Breakdown {
+  id          Int     @id @default(autoincrement())
+  deviceId    Int
+  device      Device      @relation(fields: [deviceId], references: [id])
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime @db.Date
+  takenAt     DateTime @db.Date
+  beginAt     DateTime @db.Date
+  endAt       DateTime @db.Date
+  briefing    String
 }

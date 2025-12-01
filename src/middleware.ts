@@ -8,13 +8,11 @@ export async function middleware(req: NextRequest)
     const isAuth = !!token;
     const isAuthPage = req.nextUrl.pathname.startsWith("/login");
 
-    // Si user non connecté → redirection vers /login
     if (!isAuth && !isAuthPage)
     {
         return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    // Si user connecté et essaie d'aller sur /login → redirection vers dashboard
     if (isAuth && isAuthPage)
     {
         if(token.role === "admin")

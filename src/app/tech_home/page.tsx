@@ -1,3 +1,4 @@
+import { Maintenances } from "@/components/maintenances";
 import { Navbar } from "@/components/navbar";
 
 export default function TechHome()
@@ -6,7 +7,7 @@ export default function TechHome()
         <>
             <Navbar />
             
-            PAGE TECHNICIEN
+            <Maintenances />
         </>
     )
 }
