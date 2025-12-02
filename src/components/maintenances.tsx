@@ -1,6 +1,6 @@
 "use client"
 
-import { getDevicesByUser } from "@/app/actions/Devices";
+import { getDevicesByUser } from "@/app/actions/devices";
 import { useEffect, useState } from "react"
 
 export const Maintenances = () =>
@@ -80,6 +80,7 @@ export const Maintenances = () =>
                                     <td>{ new Date(device.createdAt).toLocaleDateString() }</td>
                                     <td>{ device.address } { device.zipCode } { device.city }</td>
                                     <td className={color}>{ device.lastVisit ? nextVisit.toLocaleDateString() : "N/A" }</td>
+                                    <td><button className="hover:cursor-pointer">Traiter la maintenance</button></td>
                                 </tr>
                             )
                         })

@@ -11,6 +11,9 @@ export async function main()
     await prisma.sector.deleteMany();
     await prisma.maintenance.deleteMany();
     await prisma.breakdown.deleteMany();
+    await prisma.intervention.deleteMany();
+    await prisma.team.deleteMany();
+    await prisma.onCall.deleteMany();
 
     let sectors = [];
     

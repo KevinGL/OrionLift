@@ -1,3 +1,4 @@
+import { MenuAdmin } from "@/components/admin/menu";
 import { Navbar } from "@/components/navbar";
 
 export default function AdminHome()
@@ -5,8 +6,7 @@ export default function AdminHome()
     return (
         <>
             <Navbar />
-            
-            PAGE ADMIN
+            < MenuAdmin />
         </>
     )
 }

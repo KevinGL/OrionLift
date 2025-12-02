@@ -1,13 +1,12 @@
-import { Maintenances } from "@/components/maintenances";
+import { MenuAdmin } from "@/components/admin/menu";
 import { Navbar } from "@/components/navbar";
 
 export default function TechHome()
 {
     return (
         <>
-            <Navbar />
-            
-            <Maintenances />
+            <Navbar />            
+            <MenuAdmin />
         </>
     )
 }
