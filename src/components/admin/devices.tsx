@@ -22,7 +22,7 @@ export const ManageDevices = () =>
         {
             const list = await getDevices();
             setDevices(list);
-            setNbPages(list.length / sizePage);
+            setNbPages(list.length / sizePage + 1);
         }
 
         getAllDevices();
@@ -95,7 +95,6 @@ export const ManageDevices = () =>
                                             {() =>
                                                 {
                                                     setSector(device.id);
-                                                    setIndexDevice(index);
                                                 }}>Assigner à un secteur
                                             </button>
                                         }

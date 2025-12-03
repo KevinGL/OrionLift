@@ -24,7 +24,7 @@ model User {
   sectorId    Int?  @unique
   sector      Sector?      @relation(fields: [sectorId], references: [id])
   leaderOfTeam Team? @relation("Leader")
-  teamId      Int?     @unique
+  teamId      Int?
   team        Team?    @relation("Techs", fields: [teamId], references: [id])
   maintenances    Maintenance[]
   breakdowns      Breakdown[]

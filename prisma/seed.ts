@@ -6,18 +6,18 @@ const prisma = new PrismaClient();
 
 export async function main()
 {
-    await prisma.device.deleteMany();
+    //await prisma.device.deleteMany();
     await prisma.user.deleteMany();
-    await prisma.sector.deleteMany();
+    /*await prisma.sector.deleteMany();
     await prisma.maintenance.deleteMany();
     await prisma.breakdown.deleteMany();
     await prisma.intervention.deleteMany();
     await prisma.team.deleteMany();
-    await prisma.onCall.deleteMany();
+    await prisma.onCall.deleteMany();*/
 
     let sectors = [];
     
-    for(let i = 0 ; i < 10 ; i++)
+    for(let i = 0 ; i < 50 ; i++)
     {
         const sector = await prisma.sector.create({
             data: {
@@ -42,7 +42,7 @@ export async function main()
         }
     });
 
-    for(let i = 0 ; i < 10 ; i++)
+    for(let i = 0 ; i < 50 ; i++)
     {
         await prisma.user.create({
             data: {
@@ -56,6 +56,10 @@ export async function main()
             }
         });
     }
+
+    console.log("✅ Seed OK");
+
+    return;
 
     ////////////////////////////////////////
 

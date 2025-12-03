@@ -6,7 +6,7 @@ export default function AdminHome()
     return (
         <>
             <Navbar />
-            < MenuAdmin />
+            <MenuAdmin />
         </>
     )
 }

@@ -15,7 +15,7 @@ export const MenuAdmin = () =>
                 option === 0 &&
 
                 <div>
-                    <button className="hover:cursor-pointer" onClick={() => setOption(1)}>Techniciens</button>
+                    <button className="hover:cursor-pointer" onClick={() => setOption(1)}>Personnel</button>
                     <button className="hover:cursor-pointer" onClick={() => setOption(2)}>Équipes</button>
                     <button className="hover:cursor-pointer" onClick={() => setOption(3)}>Appareils</button>
                     <button className="hover:cursor-pointer" onClick={() => setOption(4)}>Astreintes</button>
