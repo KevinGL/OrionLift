@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ManageTeams } from "./teams";
 import { ManageTechs } from "./techs";
 import { ManageDevices } from "./devices";
+import { ManageOnCalls } from "./oncalls";
 
 export const MenuAdmin = () =>
 {
@@ -38,6 +39,12 @@ export const MenuAdmin = () =>
                 option === 3 &&
 
                 <ManageDevices />
+            }
+
+            {
+                option === 4 &&
+
+                <ManageOnCalls />
             }
 
             <button className="hover:cursor-pointer" onClick={() => setOption(0)}>Retour</button>

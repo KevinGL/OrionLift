@@ -6,10 +6,11 @@ const prisma = new PrismaClient();
 
 export async function main()
 {
-    //await prisma.device.deleteMany();
+    await prisma.device.deleteMany();
+    await prisma.sector.deleteMany();
+    await prisma.team.deleteMany();
     await prisma.user.deleteMany();
-    /*await prisma.sector.deleteMany();
-    await prisma.maintenance.deleteMany();
+    /*await prisma.maintenance.deleteMany();
     await prisma.breakdown.deleteMany();
     await prisma.intervention.deleteMany();
     await prisma.team.deleteMany();
@@ -17,7 +18,7 @@ export async function main()
 
     let sectors = [];
     
-    for(let i = 0 ; i < 50 ; i++)
+    for(let i = 0 ; i < 40 ; i++)
     {
         const sector = await prisma.sector.create({
             data: {
@@ -42,7 +43,7 @@ export async function main()
         }
     });
 
-    for(let i = 0 ; i < 50 ; i++)
+    for(let i = 0 ; i < 40 ; i++)
     {
         await prisma.user.create({
             data: {
@@ -57,9 +58,29 @@ export async function main()
         });
     }
 
-    console.log("✅ Seed OK");
+    ////////////////////////////////////////
 
-    return;
+    const users = await prisma.user.findMany();
+    users.splice(0, 1);
+    let team = {};
+
+    for(let i = 0 ; i < 40 ; i++)
+    {
+        if(i % 10 === 0)
+        {
+            team = await prisma.team.create({
+                data:
+                {
+                    leaderId: users[i].id
+                }
+            });
+        }
+
+        await prisma.user.update({
+            where: {id: users[i].id},
+            data: {teamId: team.id}
+        });
+    }
 
     ////////////////////////////////////////
 
