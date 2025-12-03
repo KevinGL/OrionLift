@@ -1,6 +1,6 @@
 "use client"
 
-import { getDevices, setSectorToDevice } from "@/app/actions/devices";
+import { addDeviceDB, getDevices, setSectorToDevice } from "@/app/actions/devices";
 import { getSectors } from "@/app/actions/sectors";
 import { useEffect, useState } from "react";
 
@@ -15,6 +15,8 @@ export const ManageDevices = () =>
     const [deviceId, setDeviceId] = useState<number>(0);
     const [message, setMessage] = useState<string>("");
     const [ref, setRef] = useState<string>("");
+    const [showAdd, setShowAdd] = useState<boolean>(false);
+    const [device, setDevice] = useState<any>({});
 
     useEffect(() =>
     {
@@ -41,9 +43,60 @@ export const ManageDevices = () =>
         setShowSectors(true);
         setDeviceId(id);
     }
+
+    const setDeviceRef = (value: string) =>
+    {
+        setDevice({...device, ref: value});
+    }
+
+    const setAddress = (value: string) =>
+    {
+        setDevice({...device, address: value});
+    }
+
+    const setZipCode = (value: string) =>
+    {
+        setDevice({...device, zipCode: value});
+    }
+
+    const setCity = (value: string) =>
+    {
+        setDevice({...device, city: value});
+    }
+
+    const setDeviceSector = (value: number) =>
+    {
+        setDevice({...device, sectorId: value});
+    }
+
+    const addDevice = async () =>
+    {
+        setShowAdd(false);
+        
+        if(await addDeviceDB(device))
+        {
+            setMessage(`Appareil ${device.ref} ajouté avec succès au secteur ${device.sectorRef}`);
+        }
+
+        else
+        {
+            setMessage("Une erreur s'est produite");
+        }
+    }
     
     return (
         <>
+            <datalist id="sectors">
+                {
+                    sectors.map((sector: any) =>
+                    {
+                        return (
+                            <option key={sector.id} value={sector.id}>Secteur num {sector.ref}</option>
+                        )
+                    })
+                }
+            </datalist>
+            
             <input type="text" placeholder="Rechercher ..." onChange={(e) => setRef(e.target.value)} />
 
             {
@@ -81,7 +134,7 @@ export const ManageDevices = () =>
                                     return device.ref.toUpperCase().indexOf(ref.toUpperCase()) > -1 || device.address.toUpperCase().indexOf(ref.toUpperCase()) > -1;
                                 }
                             })
-                        .map((device: any, index: number) =>
+                        .map((device: any) =>
                         {
                             return (
                                 <tr key={device.id}>
@@ -117,45 +170,50 @@ export const ManageDevices = () =>
                 </div>
             }
 
+            <button className="hover:cursor-pointer" onClick={() => setShowAdd(true)}>Ajouter un appareil</button>
+
             {
                 showSectors &&
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Réf</th>
-                            <th>Nombre d'appareils</th>
-                        </tr>
-                    </thead>
+                <>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Réf</th>
+                                <th>Nombre d'appareils</th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        {
-                            sectors.map((sector: any) =>
+                        <tbody>
                             {
-                                return (
-                                    <tr key={sector.id}>
-                                        <td>{ sector.ref }</td>
-                                        <td>{ sector.nbDevices }</td>
-                                        <td><button className="hover:cursor-pointer" onClick={async () =>
-                                            {
-                                                if(await setSectorToDevice(deviceId, sector.id))
+                                sectors.map((sector: any) =>
+                                {
+                                    return (
+                                        <tr key={sector.id}>
+                                            <td>{ sector.ref }</td>
+                                            <td>{ sector.nbDevices }</td>
+                                            <td><button className="hover:cursor-pointer" onClick={async () =>
                                                 {
-                                                    setShowSectors(false);
-                                                    
-                                                    setMessage(`Appareil assigné au secteur ${sector.ref}`);
+                                                    if(await setSectorToDevice(deviceId, sector.id))
+                                                    {
+                                                        setShowSectors(false);                                                    
+                                                        setMessage(`Appareil assigné au secteur ${sector.ref}`);
+                                                    }
+                                                    else
+                                                    {
+                                                        setMessage("Une erreur s'est produite");
+                                                    }
                                                 }
-                                                else
-                                                {
-                                                    setMessage("Une erreur s'est produite");
-                                                }
-                                            }
-                                        }>Assigner</button></td>
-                                    </tr>
-                                )
-                            })
-                        }
-                    </tbody>
-                </table>
+                                            }>Assigner</button></td>
+                                        </tr>
+                                    )
+                                })
+                            }
+                        </tbody>
+                    </table>
+
+                    <button className="hover:cursor-pointer" onClick={() => setShowSectors(false)}>Annuler</button>
+                </>
             }
 
             {
@@ -164,6 +222,23 @@ export const ManageDevices = () =>
                 <div>
                     <p>{ message }</p>
                     <button className="hover:cursor-pointer" onClick={() => setMessage("")}>OK</button>
+                </div>
+            }
+
+            {
+                showAdd &&
+
+                <div>
+                    <div>
+                        <input type="text" placeholder="Réf ?" onChange={(e) => setDeviceRef(e.target.value)} />
+                        <input type="text" placeholder="Adresse ?" onChange={(e) => setAddress(e.target.value)} />
+                        <input type="text" placeholder="Code postal ?" onChange={(e) => setZipCode(e.target.value)} />
+                        <input type="text" placeholder="Ville ?" onChange={(e) => setCity(e.target.value)} />
+                        <input type="text" placeholder="Secteur ?" list="sectors" onChange={(e) => setDeviceSector(parseInt(e.target.value))} />
+                    </div>
+
+                    <button className="hover:cursor-pointer" onClick={() => setShowAdd(false)}>Annuler</button>
+                    <button className="hover:cursor-pointer" onClick={addDevice}>Valider</button>
                 </div>
             }
         </>

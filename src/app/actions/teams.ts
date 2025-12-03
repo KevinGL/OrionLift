@@ -5,7 +5,7 @@ import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import { Rye } from "next/font/google";
 
-export const getTeams = async () =>
+export const getTeamsDB = async () =>
 {
     const session = await getServerSession(authOptions);
 
@@ -25,8 +25,6 @@ export const getTeams = async () =>
     {
         const techs = await prisma.user.findMany({where: {teamId: team.id}});
         const leader = await prisma.user.findFirst({where: {id: team.leaderId}});
-
-        console.log(techs);
 
         return {...team, techs, leader};
     }));

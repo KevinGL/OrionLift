@@ -21,7 +21,15 @@ export const getUsers = async () =>
 
     const users = await prisma.user.findMany();
 
-    return users;
+    const usersUpdated = await Promise.all(
+        users.map(async (user) =>
+        {
+            const sectorRef = user.sectorId ? (await prisma.sector.findFirst({where: {id: user.sectorId}}))?.ref : "N/A";
+            return {...user, sectorRef};
+        })
+    );
+
+    return usersUpdated;
 }
 
 export const addUser = async (newUser: any) =>
@@ -53,7 +61,9 @@ export const addUser = async (newUser: any) =>
         password += chars.at(index);
     }
 
-    const sectorId = (await prisma.sector.findFirst({ where: { ref: newUser.sectorRef.toString() } }))?.id;
+    const sectorRef: string = newUser.sectorRef ? newUser.sectorRef.toString() : "";
+
+    const sectorId = sectorRef !== "" ? (await prisma.sector.findFirst({ where: { ref: sectorRef } }))?.id : null;
 
     console.log(password);
 
@@ -67,7 +77,8 @@ export const addUser = async (newUser: any) =>
                 phone: newUser.phone,
                 firstname: newUser.firstname,
                 lastname: newUser.lastname,
-                sectorId: sectorId
+                sectorId: sectorId,
+                teamId: newUser.teamId
             }
         });
 

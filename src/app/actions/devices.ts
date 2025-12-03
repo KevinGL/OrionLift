@@ -3,6 +3,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
+import { Rye } from "next/font/google";
 
 export const getDevicesByUser = async () =>
 {
@@ -78,7 +79,7 @@ export const setSectorToDevice = async (deviceId: number, sectorId: number) =>
         return [];
     }
 
-    console.log(sectorId);
+    //console.log(sectorId);
 
     try
     {
@@ -99,4 +100,45 @@ export const setSectorToDevice = async (deviceId: number, sectorId: number) =>
     }
 
     return true;
+}
+
+export const addDeviceDB = async (device: any) =>
+{
+    const session = await getServerSession(authOptions);
+
+    if(!session)
+    {
+        return false;
+    }
+
+    if(session.user?.role !== "admin")
+    {
+        return false;
+    }
+
+    console.log(device.sectorId);
+
+    try
+    {
+        if(await prisma.device.create({
+            data:
+            {
+                ref: device.ref,
+                createdAt: new Date(Date.now()),
+                address: device.address,
+                zipCode: device.zipCode,
+                city: device.city,
+                sector: { connect: { id: device.sectorId } }
+            }
+        }))
+        {
+            return true;
+        }
+    }
+
+    catch(error)
+    {
+        console.error(error);
+        return false;
+    }
 }

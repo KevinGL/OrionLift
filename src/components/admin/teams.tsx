@@ -1,6 +1,6 @@
 "use client"
 
-import { addTeamDB, getTeams } from "@/app/actions/teams";
+import { addTeamDB, getTeamsDB } from "@/app/actions/teams";
 import { getUsers } from "@/app/actions/Users";
 import { tr } from "@faker-js/faker";
 import { useEffect, useState } from "react"
@@ -21,7 +21,7 @@ export const ManageTeams = () =>
     {
         const getAllTeams = async () =>
         {
-            setTeams(await getTeams());
+            setTeams(await getTeamsDB());
         }
 
         const getAllUsers = async () =>
