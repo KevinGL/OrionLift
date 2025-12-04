@@ -50,7 +50,7 @@ export const getDevicesDB = async () =>
         return [];
     }
 
-    const devices = await prisma.device.findMany();
+    /*const devices = await prisma.device.findMany();
 
     const devicesUpdated = await Promise.all(
         devices.map(async (device: any) =>
@@ -61,7 +61,16 @@ export const getDevicesDB = async () =>
         })
     );
 
-    return devicesUpdated;
+    return devicesUpdated;*/
+
+    const devices = await prisma.device.findMany({
+        include:
+        {
+            sector: true
+        }
+    });
+
+    return devices;
 }
 
 export const setSectorToDevice = async (deviceId: number, sectorId: number) =>
@@ -115,7 +124,7 @@ export const addDeviceDB = async (device: any) =>
         return false;
     }
 
-    console.log(device.sectorId);
+    //console.log(device.sectorId);
 
     try
     {

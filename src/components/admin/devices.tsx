@@ -75,7 +75,7 @@ export const ManageDevices = () =>
         
         if(await addDeviceDB(device))
         {
-            setMessage(`Appareil ${device.ref} ajouté avec succès au secteur ${device.sectorRef}`);
+            setMessage(`Appareil ${device.ref} ajouté avec succès au secteur ${device.sector.ref}`);
         }
 
         else

@@ -90,3 +90,31 @@ export const addUser = async (newUser: any) =>
         return false;
     }
 }
+
+export const getTechsDB = async () =>
+{
+    const session = await getServerSession(authOptions);
+
+    if(!session)
+    {
+        return [];
+    }
+
+    if(session.user?.role !== "admin")
+    {
+        return [];
+    }
+
+    const users = await prisma.user.findMany({
+        where:
+        {
+            role: "tech"
+        },
+        include:
+        {
+            sector: true
+        }
+    });
+
+    return users;
+}

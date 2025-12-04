@@ -68,8 +68,6 @@ export const getBreakdownsByDeviceDB = async (ref: string) =>
 
     const device = (await prisma.device.findFirst({where: {ref}}));
 
-    console.log(device);
-
     if(!device)
     {
         return [];
@@ -94,7 +92,34 @@ export const getBreakdownsByDeviceDB = async (ref: string) =>
         },
     });
 
-    //console.log(breakdowns);
-
     return breakdowns;
+}
+
+export const addBreakdownDB = async (breakdown: any): boolean =>
+{
+    const session = await getServerSession(authOptions);
+
+    if(!session)
+    {
+        return false;
+    }
+
+    if(session.user?.role !== "admin")
+    {
+        return false;
+    }
+
+    try
+    {
+        await prisma.breakdown.create({
+            data: breakdown
+        });
+
+        return true;
+    }
+    catch(error)
+    {
+        console.error(error);
+        return false;
+    }
 }

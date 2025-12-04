@@ -78,11 +78,11 @@ model Breakdown {
   userId      Int
   user        User      @relation(fields: [userId], references: [id])
   createdAt   DateTime
-  takenAt     DateTime
-  beginAt     DateTime
-  endAt       DateTime
+  takenAt     DateTime?
+  beginAt     DateTime?
+  endAt       DateTime?
   type        String
-  description String
+  description String?
   briefing    String
   onCallId    Int?
   onCall      OnCall?    @relation(fields: [onCallId], references: [id])
