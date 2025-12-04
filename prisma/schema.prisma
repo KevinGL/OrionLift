@@ -59,15 +59,15 @@ model Maintenance {
   device      Device      @relation(fields: [deviceId], references: [id])
   userId      Int
   user        User      @relation(fields: [userId], references: [id])
-  beginAt     DateTime @db.Date
-  endAt       DateTime @db.Date
-  phoneAt     DateTime @db.Date
+  beginAt     DateTime
+  endAt       DateTime
+  phoneAt     DateTime
   phoneOK     Boolean
   phoneText   String
   briefing    String
-  safetyAt    DateTime @db.Date
+  safetyAt    DateTime
   safety      String
-  wiresAt     DateTime @db.Date
+  wiresAt     DateTime
   wires       String
 }
 
@@ -77,10 +77,12 @@ model Breakdown {
   device      Device      @relation(fields: [deviceId], references: [id])
   userId      Int
   user        User      @relation(fields: [userId], references: [id])
-  createdAt   DateTime @db.Date
-  takenAt     DateTime @db.Date
-  beginAt     DateTime @db.Date
-  endAt       DateTime @db.Date
+  createdAt   DateTime
+  takenAt     DateTime
+  beginAt     DateTime
+  endAt       DateTime
+  type        String
+  description String
   briefing    String
   onCallId    Int?
   onCall      OnCall?    @relation(fields: [onCallId], references: [id])
@@ -92,8 +94,8 @@ model Intervention {
   device      Device      @relation(fields: [deviceId], references: [id])
   userId      Int
   user        User      @relation(fields: [userId], references: [id])
-  beginAt     DateTime @db.Date
-  endAt       DateTime @db.Date
+  beginAt     DateTime
+  endAt       DateTime
   briefing    String
 }
 

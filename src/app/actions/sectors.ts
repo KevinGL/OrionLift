@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 
-export const getSectors = async () =>
+export const getSectorsDB = async () =>
 {
     const session = await getServerSession(authOptions);
 

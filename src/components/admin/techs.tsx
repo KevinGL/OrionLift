@@ -1,6 +1,6 @@
 "use client"
 
-import { getSectors } from "@/app/actions/sectors";
+import { getSectorsDB } from "@/app/actions/sectors";
 import { getTeamsDB } from "@/app/actions/teams";
 import { addUser, getUsers } from "@/app/actions/Users";
 import { useEffect, useState } from "react"
@@ -28,7 +28,7 @@ export const ManageTechs = () =>
 
         const getAllSectors = async () =>
         {
-            setSectors(await getSectors());
+            setSectors(await getSectorsDB());
         }
 
         const getTeams = async () =>
@@ -125,6 +125,7 @@ export const ManageTechs = () =>
                                     <td>{ user.phone }</td>
                                     <td>{ user.role }</td>
                                     <td>{ user.sectorRef }</td>
+                                    <td><button className="hover:cursor-pointer">Voir l'activité</button></td>
                                     <td><button className="hover:cursor-pointer">Supprimer</button></td>
                                 </tr>
                             )

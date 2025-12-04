@@ -5,6 +5,7 @@ import { ManageTeams } from "./teams";
 import { ManageTechs } from "./techs";
 import { ManageDevices } from "./devices";
 import { ManageOnCalls } from "./oncalls";
+import { ManageBreakdowns } from "./breakdowns";
 
 export const MenuAdmin = () =>
 {
@@ -19,7 +20,8 @@ export const MenuAdmin = () =>
                     <button className="hover:cursor-pointer" onClick={() => setOption(1)}>Personnel</button>
                     <button className="hover:cursor-pointer" onClick={() => setOption(2)}>Équipes</button>
                     <button className="hover:cursor-pointer" onClick={() => setOption(3)}>Appareils</button>
-                    <button className="hover:cursor-pointer" onClick={() => setOption(4)}>Astreintes</button>
+                    <button className="hover:cursor-pointer" onClick={() => setOption(4)}>Pannes</button>
+                    <button className="hover:cursor-pointer" onClick={() => setOption(5)}>Astreintes</button>
                 </div>
             }
 
@@ -43,6 +45,12 @@ export const MenuAdmin = () =>
 
             {
                 option === 4 &&
+
+                <ManageBreakdowns />
+            }
+
+            {
+                option === 5 &&
 
                 <ManageOnCalls />
             }

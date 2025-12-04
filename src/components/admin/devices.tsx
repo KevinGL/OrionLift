@@ -1,7 +1,7 @@
 "use client"
 
-import { addDeviceDB, getDevices, setSectorToDevice } from "@/app/actions/devices";
-import { getSectors } from "@/app/actions/sectors";
+import { addDeviceDB, getDevicesDB, setSectorToDevice } from "@/app/actions/devices";
+import { getSectorsDB } from "@/app/actions/sectors";
 import { useEffect, useState } from "react";
 
 export const ManageDevices = () =>
@@ -22,7 +22,7 @@ export const ManageDevices = () =>
     {
         const getAllDevices = async () =>
         {
-            const list = await getDevices();
+            const list = await getDevicesDB();
             setDevices(list);
             setNbPages(list.length / sizePage + 1);
         }
@@ -31,7 +31,7 @@ export const ManageDevices = () =>
 
         const getAllSectors = async () =>
         {
-            setSectors(await getSectors());
+            setSectors(await getSectorsDB());
         }
 
         getAllDevices();

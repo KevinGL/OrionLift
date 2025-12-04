@@ -3,7 +3,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
-import { Rye } from "next/font/google";
 
 export const getDevicesByUser = async () =>
 {
@@ -37,7 +36,7 @@ export const getDevicesByUser = async () =>
     return devicesUpdated;
 }
 
-export const getDevices = async () =>
+export const getDevicesDB = async () =>
 {
     const session = await getServerSession(authOptions);
 

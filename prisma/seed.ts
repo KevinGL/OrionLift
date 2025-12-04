@@ -6,181 +6,164 @@ const prisma = new PrismaClient();
 
 export async function main()
 {
-    await prisma.device.deleteMany();
-    await prisma.sector.deleteMany();
-    await prisma.team.deleteMany();
-    await prisma.user.deleteMany();
-    /*await prisma.maintenance.deleteMany();
+    await prisma.maintenance.deleteMany();
     await prisma.breakdown.deleteMany();
     await prisma.intervention.deleteMany();
+    await prisma.onCall.deleteMany();
+    await prisma.device.deleteMany();
     await prisma.team.deleteMany();
-    await prisma.onCall.deleteMany();*/
+    await prisma.sector.deleteMany();
+    await prisma.user.deleteMany();
 
-    let sectors = [];
-    
-    for(let i = 0 ; i < 40 ; i++)
+    const sectors = [];
+    for (let i = 0; i < 9; i++)
     {
-        const sector = await prisma.sector.create({
-            data: {
-                ref: (i + 1).toString()
-            }
-        });
-
-        sectors.push(sector);
+        sectors.push(await prisma.sector.create({ data: { ref: `S-${i + 1}` } }));
     }
     
     ////////////////////////////////////////
     
     await prisma.user.create({
-    data:
+        data:
         {
             role: "admin",
-            email: "kevinferrogl@gmail.com",
-            phone: "0642427521",
-            firstname: "Kévin",
-            lastname: "Gay",
-            password: await bcrypt.hash("admin", 10)
-        }
+            email: "admin@test.com",
+            phone: "0600000000",
+            firstname: "Admin",
+            lastname: "Test",
+            password: await bcrypt.hash("admin", 10),
+        },
     });
 
-    for(let i = 0 ; i < 40 ; i++)
+    const techs = [];
+    for (let i = 0; i < 10; i++)
     {
-        await prisma.user.create({
-            data: {
-                role: "tech",
-                email: faker.internet.email(),
-                phone: faker.phone.number(),
-                firstname: faker.person.firstName(),
-                lastname: faker.person.lastName(),
-                password: await bcrypt.hash("tech", 10),
-                sector: { connect: { id: sectors[i].id } }
-            }
-        });
+        techs.push(
+            await prisma.user.create({
+                data:
+                {
+                    role: i === 0 ? "admin" : "tech",
+                    email: faker.internet.email(),
+                    phone: faker.phone.number(),
+                    firstname: faker.person.firstName(),
+                    lastname: faker.person.lastName(),
+                    password: await bcrypt.hash("tech", 10),
+                    ...(
+                        i === 0
+                        ? {}
+                        : { sector: { connect: { id: sectors[i - 1].id } } }
+                    )
+                },
+            })
+        );
     }
 
     ////////////////////////////////////////
 
-    const users = await prisma.user.findMany();
-    users.splice(0, 1);
-    let team = {};
-
-    for(let i = 0 ; i < 40 ; i++)
-    {
-        if(i % 10 === 0)
+    const team = await prisma.team.create({
+        data:
         {
-            team = await prisma.team.create({
-                data:
-                {
-                    leaderId: users[i].id
-                }
-            });
-        }
+            leaderId: techs[0].id,
+        },
+    });
 
+    for (const tech of techs)
+    {
         await prisma.user.update({
-            where: {id: users[i].id},
-            data: {teamId: team.id}
+            where: { id: tech.id },
+            data: { teamId: team.id },
         });
     }
 
     ////////////////////////////////////////
 
     const devices: any[] = [];
+    const prefixes: string[] = ["AA", "DA", "SA", "TA", "OA", "KA"];
 
-    sectors.map(async (sector) =>
+    for (const sector of sectors)
     {
-        const minDevices = 80;
-        const maxDevices = 150;
-        const nbDevices = Math.floor(Math.random() * (maxDevices - minDevices)) + minDevices;
-
-        for(let i = 0 ; i < nbDevices ; i++)
+        for (let i = 0; i < 5; i++)
         {
-            const prefixes: string[] = ["AA", "DA", "SA", "TA", "OA", "KA"];
+            const indexPrefix = Math.floor(Math.random() * prefixes.length);
             
-            const ref: string = prefixes[Math.floor(Math.random() * prefixes.length)] + faker.string.numeric(5);
-
-            const device =
-            {
-                ref,
-                createdAt: faker.date.between({
-                    from: new Date(2020, 0, 1),
-                    to: new Date(2024, 11, 31)
-                }),
-                address: faker.location.streetAddress(),
-                zipCode: faker.location.zipCode(),
-                city: faker.location.city(),
-                sector: { connect: { id: sector.id } }
-            }
-
-            devices.push(device);
-            
-            await prisma.device.create({
-                data: device
-            });
+            devices.push(
+                await prisma.device.create({
+                    data:
+                    {
+                        ref: `${prefixes[indexPrefix]}${faker.string.numeric(5)}`,
+                        createdAt: faker.date.past(),
+                        address: faker.location.streetAddress(),
+                        zipCode: faker.location.zipCode(),
+                        city: faker.location.city(),
+                        sector: { connect: { id: sector.id } },
+                    }
+                })
+            );
         }
-    });
+    }
 
     ////////////////////////////////////////
 
-    /*devices.map(async (device) =>
+    const types: string[] =
+    [
+        "ASCBLQ",
+        "ASCBRU",
+        "PBETAG",
+        "OBJFOS",
+        "PERSBLQ"
+    ];
+
+    for(const device of devices)
     {
-        const date: Date = new Date();
+        const tech = techs.find((t) => t.sectorId === device.sectorId) ?? techs[0];
 
-        date.setFullYear(2024);
-        date.setDate(Math.floor(Math.random() * 27) + 1);
-        date.setMonth(Math.floor(Math.random() * 11) + 1);
-        date.setHours(Math.floor(Math.random() * 8) + 9);
-        date.setMinutes(Math.floor(Math.random() * 60));
-        date.setSeconds(Math.floor(Math.random() * 60));
+        const indexTech = Math.floor(Math.random() * techs.length);
+        const onCall = await prisma.onCall.create({
+            data:
+            {
+                user: {connect: {id: techs[indexTech].id}},
+                beginAt: faker.date.recent(),
+                endAt: faker.date.recent()
+            }
+        });
 
-        const beginAt: Date = new Date();
-        beginAt.setTime(date.getDate() - 30 * 60 * 1000);
+        const indexType = Math.floor(Math.random() * types.length);
+        await prisma.breakdown.create({
+            data:
+            {
+                device: { connect: { id: device.id } },
+                user: { connect: { id: tech.id } },
+                createdAt: faker.date.recent(),
+                takenAt: faker.date.recent(),
+                beginAt: faker.date.recent(),
+                endAt: faker.date.recent(),
+                type: types[indexType],
+                description: faker.lorem.sentence(),
+                briefing: faker.lorem.sentence(),
+                onCall: {connect: {id: onCall.id}}
+            },
+        });
 
-        const phoneAt: Date = new Date();
-        phoneAt.setTime(date.getDate() - 15 * 60 * 1000);
+        await prisma.maintenance.create({
+            data:
+            {
+                device: { connect: { id: device.id } },
+                user: { connect: { id: tech.id } },
+                phoneAt: faker.date.recent(),
+                phoneOK: true,
+                phoneText: "OK",
+                beginAt: faker.date.recent(),
+                endAt: faker.date.recent(),
+                safetyAt: faker.date.recent(),
+                wiresAt: faker.date.recent(),
+                briefing: faker.lorem.sentence(),
+                safety: faker.lorem.sentence(),
+                wires: faker.lorem.sentence()
+            },
+        });
+    }
 
-        while(1)
-        {
-            await prisma.maintenance.create({
-                data: {
-                    device: { connect: { id: device.id } },
-                    user: { connect: { id: device.sector.user.id } },
-                    beginAt,
-                    endAt: date,
-                    phoneAt,
-                    phoneOK: Math.random() > 0.5 ? true : false,
-                    phoneText: faker.lorem.sentence(),
-                    briefing: faker.lorem.sentence(),
-                    safetyAt: date,
-                    safety: Math.random() > 0.5 ? "" : faker.lorem.sentence(),
-                    wiresAt: date,
-                    wires: Math.random() > 0.5 ? "" : faker.lorem.sentence()
-                }
-            });
-
-            const gap: number = Math.floor(5 * Math.random() - 2);
-
-            date.setTime(date.getTime() + 6 * 7 * 24 * 3600 * 1000 + gap * 24 * 3600 * 1000);
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////
-
-        const nbBreakdowns: number = Math.floor(Math.random() * 14) + 1;
-        
-        for(let i = 0 ; i < nbBreakdowns ; i++)
-        {
-            const duration: number = Math.floor(Math.random() * 30) + 30;
-            beginAt.setTime(date.getDate() - duration * 60 * 1000);
-            
-            await prisma.breakdown.create({
-                data: {
-                    device: { connect: { id: device.id } },
-                    user: { connect: { id: device.sector.user.id } },
-                    beginAt,
-                    endAt: date
-                }
-            });
-        }
-    });*/
+    await prisma.$disconnect();
 
     console.log("✅ Seed OK");
 }
