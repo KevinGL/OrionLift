@@ -4,6 +4,7 @@ import { addBreakdownDB, getBreakdownsByDeviceDB, getBreakdownsBySectorDB } from
 import { getDevicesDB } from "@/app/actions/devices";
 import { getSectorsDB } from "@/app/actions/sectors";
 import { getTechsDB } from "@/app/actions/Users";
+import { getSocket } from "@/app/sockets/sockets";
 import { useEffect, useState } from "react";
 
 export const ManageBreakdowns = () =>
@@ -116,6 +117,10 @@ export const ManageBreakdowns = () =>
 
         if(await addBreakdownDB(breakdownDB))
         {
+            const socket = getSocket();
+            
+            socket.emit("new_breakdown", {tech: breakdown.user.id, desc: breakdown.description, device: breakdown.device, type: breakdown.type});
+            
             setMessage("Panne créée");
         }
         else
