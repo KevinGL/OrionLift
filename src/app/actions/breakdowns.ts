@@ -123,3 +123,83 @@ export const addBreakdownDB = async (breakdown: any): boolean =>
         return false;
     }
 }
+
+export const getBreakdownsByTechDB = async () =>
+{
+    const session = await getServerSession(authOptions);
+
+    if(!session)
+    {
+        return [];
+    }
+
+    const breakdowns = await prisma.breakdown.findMany({
+        where:
+        {
+            userId: session.user?.id,
+            endAt: null
+        },
+
+        include:
+        {
+            device: true
+        }
+    });
+
+    return breakdowns;
+}
+
+export const setTaken = async (id: number) =>
+{
+    const session = await getServerSession(authOptions);
+
+    if(!session)
+    {
+        return false;
+    }
+
+    try
+    {
+        await prisma.breakdown.update({
+            where:
+            {
+                id
+            },
+            data:
+            {
+                takenAt: new Date(Date.now())
+            }
+        });
+
+        return true;
+    }
+    catch(error)
+    {
+        console.error(error);
+        return false;
+    }
+}
+
+export const getBreakdownById = async (id: number) =>
+{
+    const session = await getServerSession(authOptions);
+
+    if(!session)
+    {
+        return null;
+    }
+
+    const breakdown = await prisma.breakdown.findFirst({where: {id}});
+
+    if(!breakdown)
+    {
+        return null;
+    }
+
+    if(breakdown.userId !== session?.user?.id)
+    {
+        return null;
+    }
+
+    return breakdown;
+}

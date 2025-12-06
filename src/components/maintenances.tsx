@@ -56,7 +56,7 @@ export const Maintenances = () =>
                             {
                                 nextVisit.setTime(device.lastVisit?.endAt.getTime() + 6 * 7 * 24 * 3600 * 1000);
 
-                                if(delay >= 5 && delay < 6)
+                                if(delay < 6)
                                 {
                                     color = "text-green-500";
                                 }

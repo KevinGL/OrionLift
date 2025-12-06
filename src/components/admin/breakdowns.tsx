@@ -4,7 +4,7 @@ import { addBreakdownDB, getBreakdownsByDeviceDB, getBreakdownsBySectorDB } from
 import { getDevicesDB } from "@/app/actions/devices";
 import { getSectorsDB } from "@/app/actions/sectors";
 import { getTechsDB } from "@/app/actions/Users";
-import { getSocket } from "@/app/sockets/sockets";
+import { getSocket } from "@/lib/ws";
 import { useEffect, useState } from "react";
 
 export const ManageBreakdowns = () =>
@@ -119,7 +119,14 @@ export const ManageBreakdowns = () =>
         {
             const socket = getSocket();
             
-            socket.emit("new_breakdown", {tech: breakdown.user.id, desc: breakdown.description, device: breakdown.device, type: breakdown.type});
+            socket?.send(JSON.stringify({
+                event: "new_breakdown",
+                tech: breakdown.user.id,
+                desc: breakdown.description,
+                type: breakdown.type,
+                ref: breakdown.device.ref,
+                location: `${breakdown.device.address} ${breakdown.device.zipCode} ${breakdown.device.city}`
+            }));
             
             setMessage("Panne créée");
         }

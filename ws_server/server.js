@@ -1,51 +1,43 @@
-import { Server } from "socket.io";
+import { WebSocketServer } from "ws";
 
-const io = new Server(3001,
-{
-    cors: { origin: "*" }
-});
+const wss = new WebSocketServer({ port: 3001 });
 
 const clients = new Map();
 
-io.on("connection", (socket) =>
+wss.on("connection", (ws) =>
 {
-    console.log("Connexion :", socket.id);
+    console.log("Client connecté");
 
-    socket.on("presenting", (data) =>
+    ws.on("message", (data) =>
     {
-        console.log("Client présenté :", data.id, "(socket=", socket.id, ")");
-
-        clients.set(data.id, {...data, socket});
+        const parsed = JSON.parse(data);
         
-        console.log("Clients enregistrés :", [...clients.keys()]);
-    });
+        //console.log("Message reçu :", JSON.parse(data));
+        console.log(parsed);
 
-    socket.on("new_breakdown", (data) =>
-    {
-        const target = clients.get(data.tech);
-        console.log("Recherche du client", data.tech, [...clients.keys()]);
-
-        if (target)
+        if(parsed.event === "presenting")
         {
-            console.log("Envoi de la panne au client", data.tech);
-            target.socket.emit("new_breakdown", data);
+            clients.set(parsed.id, {id: parsed.id, role: parsed.role, ws});
+            console.log("Présentation de : " + parsed.id);
         }
+
         else
+        if(parsed.event === "new_breakdown")
         {
-            console.log("Client NON trouvé");
-        }
-    });
-
-    socket.on("disconnect", () =>
-    {
-        for (const [id, info] of clients.entries())
-        {
-            if (info.socket.id === socket.id)
+            const client = clients.get(parsed.tech);
+            
+            if(!client)
             {
-                clients.delete(id);
-                console.log("Client supprimé", id);
-                break;
+                console.error(`Client ${parsed.tech} introuvable`);
+            }
+
+            else
+            {
+                client.ws.send(JSON.stringify({event: "new_breakdown", desc: parsed.desc, device: parsed.device, type: parsed.type}));
+                console.log("Panne envoyée");
             }
         }
     });
+
+    //ws.send("Bienvenue !");
 });

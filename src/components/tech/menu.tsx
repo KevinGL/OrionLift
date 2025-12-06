@@ -2,6 +2,7 @@
 
 import { Maintenances } from "@/components/maintenances";
 import { useState } from "react";
+import { Breakdowns } from "./breakdowns";
 
 export const MenuTech = () =>
 {
@@ -25,6 +26,15 @@ export const MenuTech = () =>
 
                 <>
                     <Maintenances />
+                    <button className="hover:cursor-pointer" onClick={() => setOption(0)}>Retour</button>
+                </>
+            }
+
+            {
+                option === 2 &&
+
+                <>
+                    <Breakdowns />
                     <button className="hover:cursor-pointer" onClick={() => setOption(0)}>Retour</button>
                 </>
             }

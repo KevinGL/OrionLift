@@ -1,10 +1,9 @@
 "use client"
 
-import { getSocket } from "@/app/sockets/sockets";
+import { connectSocket } from "@/lib/ws";
 import { getSession, signIn } from "next-auth/react"
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { io } from "socket.io-client";
 
 export default function SignIn()
 {
@@ -27,18 +26,7 @@ export default function SignIn()
         {
             const session = await getSession();
 
-            const socket = getSocket();
-
-            socket.on("connect", () =>
-            {
-                console.log("Connecté avec socket ID :", socket.id);
-                
-                socket.emit("presenting",
-                {
-                    id: session?.user?.id,
-                    role: session?.user?.role
-                });
-            });
+            connectSocket(session?.user?.id, session?.user?.role);
 
             if (session?.user?.role === "admin") 
             {

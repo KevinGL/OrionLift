@@ -1,35 +1,21 @@
 "use client"
 
-import { getSocket } from "@/app/sockets/sockets";
-import { signOut } from "next-auth/react";
+import { connectSocket } from "@/lib/ws";
+import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 export const Navbar = () =>
 {
     const [newBreakdown, setNewBreakdown] = useState<any>(null);
+    const session = useSession();
     
     useEffect(() =>
     {
-        const handler = (data: any) =>
+        if(session.status === "authenticated")
         {
-            //console.log("BREAKDOWN:", data);
-            setNewBreakdown({
-                desc: data.desc,
-                type: data.type,
-                location: `${data.device.address} ${data.device.zipCode} ${data.device.city}`,
-                ref: data.device.ref
-            });
-        };
-
-        const socket = getSocket();
-
-        socket.on("new_breakdown", handler);
-
-        return () =>
-        {
-            socket.off("new_breakdown", handler);
-        };
-    }, []);
+            connectSocket(session.data.user.id, session.data.user.role);
+        }
+    }, [session]);
     
     return (
         <>
@@ -46,7 +32,7 @@ export const Navbar = () =>
                     <h2>Type : {newBreakdown.type}</h2>
                     <h2>Adresse : {newBreakdown.location}</h2>
                     <h2>Référence : {newBreakdown.ref}</h2>
-                    <button className="hover:cursor-pointer" onClick={() => setNewBreakdown({})}>OK</button>
+                    <button className="hover:cursor-pointer" onClick={() => setNewBreakdown(null)}>OK</button>
                 </div>
             }
         </>
