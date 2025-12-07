@@ -78,127 +78,164 @@ export const ManageTechs = () =>
     }
     
     return (
-        <>
-            <datalist id="sectors">
-                {
-                    sectors.map((sector: any) =>
-                    {
-                        return (
-                            <option key={sector.id} value={sector.ref}></option>
-                        )
-                    })
-                }
-            </datalist>
+        <div className="w-full mx-auto p-4 md:p-8">
 
-            <div>
+            {/* Pagination top */}
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
                 {Array.from({ length: nbPages }).map((_, i) => (
-                    <span className={"hover:cursor-pointer" + (page === i ? " text-blue-500" : "")} key={i} onClick={() => setPage(i)}>{i + 1} </span>
+                    <button
+                        key={i}
+                        onClick={() => setPage(i)}
+                        className={`px-3 py-1 rounded-md text-sm 
+                            ${page === i ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}
+                        `}
+                    >
+                        {i + 1}
+                    </button>
                 ))}
             </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Prénom</th>
-                        <th>Nom</th>
-                        <th>Email</th>
-                        <th>Tél</th>
-                        <th>Rôle</th>
-                        <th>Secteur attribué</th>
-                    </tr>
-                </thead>
 
-                <tbody>
-                    {
-                        users
-                        .filter((_, index: number) =>
-                        {
-                            return index >= page * sizePage && index < (page + 1) * sizePage;
-                        })
-                        .map((user: any) =>
-                        {
-                            return (
-                                <tr key={ user.id }>
-                                    <td>{ user.firstname }</td>
-                                    <td>{ user.lastname }</td>
-                                    <td>{ user.email }</td>
-                                    <td>{ user.phone }</td>
-                                    <td>{ user.role }</td>
-                                    <td>{ user.sectorRef }</td>
-                                    <td><button className="hover:cursor-pointer">Voir l'activité</button></td>
-                                    <td><button className="hover:cursor-pointer">Supprimer</button></td>
+            {/* Table container (scrollable on mobile) */}
+            <div className="w-full overflow-x-auto">
+                <table className="min-w-max w-full border-collapse">
+                    <thead className="bg-blue-100 text-blue-700">
+                        <tr>
+                            <th className="px-4 py-2">Prénom</th>
+                            <th className="px-4 py-2">Nom</th>
+                            <th className="px-4 py-2">Email</th>
+                            <th className="px-4 py-2">Tél</th>
+                            <th className="px-4 py-2">Rôle</th>
+                            <th className="px-4 py-2">Secteur</th>
+                            <th className="px-4 py-2">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {users
+                            .slice(page * sizePage, (page + 1) * sizePage)
+                            .map((user) => (
+                                <tr key={user.id} className="border-b hover:bg-gray-50">
+                                    <td className="px-4 py-2">{user.firstname}</td>
+                                    <td className="px-4 py-2">{user.lastname}</td>
+                                    <td className="px-4 py-2">{user.email}</td>
+                                    <td className="px-4 py-2">{user.phone}</td>
+                                    <td className="px-4 py-2">{user.role}</td>
+                                    <td className="px-4 py-2">{user.sectorRef ?? "-"}</td>
+                                    <td className="px-4 py-2 flex gap-2">
+                                        <button className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm">
+                                            Activité
+                                        </button>
+                                        <button className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm">
+                                            Supprimer
+                                        </button>
+                                    </td>
                                 </tr>
-                            )
-                        })
-                    }
-                </tbody>
-            </table>
+                            ))}
+                    </tbody>
+                </table>
+            </div>
 
-            <div>
+            {/* Pagination bottom */}
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
                 {Array.from({ length: nbPages }).map((_, i) => (
-                    <span className={"hover:cursor-pointer" + (page === i ? " text-blue-500" : "")} key={i} onClick={() => setPage(i)}>{i + 1} </span>
+                    <button
+                        key={i}
+                        onClick={() => setPage(i)}
+                        className={`px-3 py-1 rounded-md text-sm 
+                            ${page === i ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}
+                        `}
+                    >
+                        {i + 1}
+                    </button>
                 ))}
             </div>
 
-            <button className="hover:cursor-pointer" onClick={() => setShowForm(true)} >Ajouter un membre</button>
+            {/* Add User */}
+            <div className="mt-6 flex justify-center">
+                <button
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 transition"
+                    onClick={() => setShowForm(true)}
+                >
+                    + Ajouter un membre
+                </button>
+            </div>
 
-            {
-                showForm && 
+            {/* Add user form */}
+            {showForm && (
+                <div className="mt-6 p-6 bg-white shadow-md rounded-lg max-w-xl mx-auto">
 
-                <div>
-                    <datalist id="teams">
-                        {
-                            teams.map((team) =>
+                    <h2 className="text-xl font-semibold text-blue-600 mb-4">Créer un membre</h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input className="input" placeholder="Prénom" onChange={(e) => setFirstname(e.target.value)} />
+                        <input className="input" placeholder="Nom" onChange={(e) => setLastname(e.target.value)} />
+                        <input className="input" placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+                        <input className="input" placeholder="Téléphone" onChange={(e) => setPhone(e.target.value)} />
+
+                        {/* Secteur */}
+                        <input list="sectors" className="input" placeholder="Secteur"
+                            onChange={(e) => setSector(Number(e.target.value))}
+                        />
+                        <datalist id="sectors">
+                            {sectors.map((s) => (
+                                <option key={s.id} value={s.ref} />
+                            ))}
+                        </datalist>
+
+                        {/* Équipe */}
+                        <input list="teams" className="input" placeholder="Équipe"
+                            onChange={(e) => setTeam(Number(e.target.value))}
+                        />
+                        <datalist id="teams">
+                            {teams.map((t) => (
+                                <option key={t.id} value={t.id}>
+                                    {`Équipe de ${t.leader.firstname} ${t.leader.lastname}`}
+                                </option>
+                            ))}
+                        </datalist>
+
+                        {/* Rôle */}
+                        <select className="input" onChange={(e) => setRole(e.target.value)}>
+                            <option value="tech">Technicien</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <button
+                        className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                        onClick={async () => {
+                            if (await addUser(newUser))
                             {
-                                return (
-                                    <option key={team.id} value={team.id}>{"Équipe de " + team.leader.firstname + " " + team.leader.lastname}</option>
-                                )
-                            })
-                        }
-                    </datalist>
-
-                    <input type="text" placeholder="Prénom" onChange={(e) => setFirstname(e.target.value)} />
-                    <input type="text" placeholder="Nom" onChange={(e) => setLastname(e.target.value)} />
-                    <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-                    <input type="text" placeholder="Secteur" list="sectors" onChange={(e) => setSector(parseInt(e.target.value))} />
-                    <input type="text" placeholder="Tél" onChange={(e) => setPhone(e.target.value)} />
-                    <input type="text" placeholder="Équipe" list="teams" onChange={(e) => setTeam(parseInt(e.target.value))} />
-
-                    <label htmlFor="">Role ?</label>
-                    <select name="" id="" onChange={(e) => setRole(e.target.value)}>
-                        <option value="admin">Admin</option>
-                        <option value="tech">Technicien</option>
-                    </select>
-
-                    <button className="hover:cursor-pointer" onClick={async() =>
-                        {
-                            if(await addUser(newUser))
-                            {
-                                if(newUser.sectorRef)
-                                {
-                                    setMessage(`Membre assigné au secteur ${newUser.sectorRef}`);
-                                }
-                                else
-                                {
-                                    setMessage("Membre ajouté");
-                                }
+                                setMessage("Utilisateur ajouté !");
+                                setShowForm(false);
                             }
                             else
                             {
-                                setMessage("Une erreur s'est produite");
+                                setMessage("Erreur lors de l’ajout.");
                             }
-                        }}>Valider</button>
-                </div>
-            }
+                        }}>
+                        Valider
+                    </button>
 
-            {
-                message !== "" &&
-
-                <div>
-                    <p>{ message }</p>
-                    <button className="hover:cursor-pointer" onClick={() => setMessage("")}>OK</button>
+                    <button
+                        className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                        onClick={async () => setShowForm(false)}>
+                        Annuler
+                    </button>
                 </div>
-            }
-        </>
-    )
+            )}
+
+            {/* Message modal */}
+            {message && (
+                <div className="mt-4 flex flex-col items-center">
+                    <p className="text-blue-600 font-medium">{message}</p>
+                    <button className="mt-2 px-4 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                        onClick={() => setMessage("")}
+                    >
+                        OK
+                    </button>
+                </div>
+            )}
+        </div>
+    );
 }

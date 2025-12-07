@@ -137,7 +137,8 @@ export const ManageBreakdowns = () =>
     }
 
     return (
-        <>
+        <div className="p-4 md:p-8 space-y-6">
+
             <datalist id="devices">
                 {
                     devices.map((device: any) =>
@@ -155,115 +156,223 @@ export const ManageBreakdowns = () =>
                     })
                 }
             </datalist>
-            
-            <div>
-                <button className="hover:cursor-pointer" onClick={getSectors}>Historique par secteur</button>
-                <button className="hover:cursor-pointer" onClick={() => setShowInputDevice(true)}>Historique par appareil</button>
-                <button className="hover:cursor-pointer" onClick={() => {setShowCreateBr(true)}}>Créer une panne</button>
+
+            {/* ACTION BAR */}
+            <div className="flex flex-wrap gap-3">
+                <button 
+                    onClick={() =>
+                        {
+                            setBreakdowns([]);
+                            getSectors();
+                            setShowInputDevice(false);
+                            setShowCreateBr(false);
+                        }
+                    }
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 transition"
+                >
+                    Historique par secteur
+                </button>
+
+                <button 
+                    onClick={() =>
+                        {
+                            setBreakdowns([]);
+                            setShowInputDevice(true);
+                            setSectors([]);
+                            setShowCreateBr(false);
+                        }
+                    }
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 transition"
+                >
+                    Historique par appareil
+                </button>
+
+                <button 
+                    onClick={() =>
+                        {
+                            setBreakdowns([]);
+                            setShowCreateBr(true);
+                            setShowInputDevice(false);
+                            setSectors([]);
+                        }
+                    }
+                    className="px-4 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600 transition"
+                >
+                    Créer une panne
+                </button>
             </div>
 
-            {
-                sectors.length > 0 &&
+            {/* RECHERCHE PAR APPAREIL */}
+            {showInputDevice && (
+                <div className="bg-white shadow rounded-md p-4 space-y-3 max-w-md">
+                    <input 
+                        type="text" 
+                        list="devices" 
+                        className="w-full border rounded p-2"
+                        placeholder="Réf / ID appareil"
+                        onChange={(e) => setRef(e.target.value)}
+                    />
+                    <div className="flex gap-3">
+                        <button 
+                            onClick={getByDevice}
+                            className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        >
+                            Valider
+                        </button>
+                        <button 
+                            onClick={() => setShowInputDevice(false)}
+                            className="flex-1 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+                        >
+                            Annuler
+                        </button>
+                    </div>
+                </div>
+            )}
 
-                <div>
-                    <ul>
-                        {
-                            sectors.map((sector: any) =>
-                            {
-                                return (
-                                    <li key={sector.id}><button className="hover:cursor-pointer" onClick={() => getBySector(sector.id)}>Secteur {sector.ref}</button></li>
-                                )
-                            })
-                        }
+            {/* LISTE SECTEURS */}
+            {sectors.length > 0 && (
+                <div className="bg-white shadow rounded-md p-4">
+                    <ul className="space-y-2">
+                        {sectors.map((s) => (
+                            <li key={s.id}>
+                                <button 
+                                    onClick={() => getBySector(s.id)}
+                                    className="text-blue-600 hover:underline"
+                                >
+                                    Secteur {s.ref}
+                                </button>
+                            </li>
+                        ))}
                     </ul>
-                    <button className="hover:cursor-pointer" onClick={() => setSectors([])}>Annuler</button>
+
+                    <button 
+                        onClick={() => setSectors([])}
+                        className="mt-3 px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
+                    >
+                        Annuler
+                    </button>
                 </div>
-            }
+            )}
 
-            {
-                showInputDevice &&
+            {/* TABLEAU PANNE RESPONSIVE */}
+            {breakdowns.length > 0 && (
+                <div className="overflow-x-auto bg-white shadow rounded-md">
+                    <table className="w-full min-w-[900px] text-sm">
+                        <thead className="bg-gray-100 text-gray-700">
+                            <tr>
+                                <th className="p-2 text-left">Créée le</th>
+                                <th className="p-2 text-left">Prise en charge</th>
+                                <th className="p-2 text-left">Traitée</th>
+                                <th className="p-2 text-left">Clôturée</th>
+                                <th className="p-2 text-left">Technicien</th>
+                                <th className="p-2 text-left">Appareil</th>
+                                <th className="p-2 text-left">Bilan</th>
+                                <th className="p-2 text-left">Astreinte</th>
+                            </tr>
+                        </thead>
 
-                <div>
-                    <input type="text" list="devices" onChange={(e) => setRef(e.target.value)} />
-                    <button className="hover:cursor-pointer" onClick={getByDevice}>Valider</button>
-                    <button className="hover:cursor-pointer" onClick={() => setShowInputDevice(false)}>Annuler</button>
+                        <tbody>
+                            {breakdowns.map((b) => (
+                                <tr key={b.id} className="border-t">
+                                    <td className="p-2">{new Date(b.createdAt).toLocaleString()}</td>
+                                    <td className="p-2">{b.takenAt ? new Date(b.takenAt).toLocaleString() : "—"}</td>
+                                    <td className="p-2">{b.beginAt ? new Date(b.beginAt).toLocaleString() : "—"}</td>
+                                    <td className="p-2">{b.endAt ? new Date(b.endAt).toLocaleString() : "—"}</td>
+                                    <td className="p-2">{b.user.firstname} {b.user.lastname}</td>
+                                    <td className="p-2">{b.device.ref}</td>
+                                    <td className="p-2">{b.briefing || "—"}</td>
+                                    <td className="p-2">{b.oncall ? "Oui" : "Non"}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
-            }
+            )}
 
-            {
-                breakdowns.length > 0 &&
+            {/* FORMULAIRE CREATION PANNE */}
+            {showCreateBr && (
+                <div className="bg-white shadow-lg rounded-md p-6 max-w-xl mx-auto space-y-4">
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Créée le</th>
-                            <th>Prise en charge le</th>
-                            <th>Traitée le</th>
-                            <th>Clôturée le</th>
-                            <th>Technicien affilée</th>
-                            <th>Appareil concerné</th>
-                            <th>Bilan technicien</th>
-                            <th>Astreinte ?</th>
-                        </tr>
-                    </thead>
+                    <h2 className="text-lg font-semibold text-gray-700 mb-2">Créer une panne</h2>
 
-                    <tbody>
-                        {
-                            breakdowns.map((b: any) =>
-                            {
-                                return (
-                                    <tr key={b.id}>
-                                        <td>{new Date(b.createdAt).toLocaleDateString()} à {new Date(b.createdAt).toLocaleTimeString()}</td>
-                                        <td>{new Date(b.takenAt).toLocaleDateString()} à {new Date(b.createdAt).toLocaleTimeString()}</td>
-                                        <td>{new Date(b.beginAt).toLocaleDateString()} à {new Date(b.createdAt).toLocaleTimeString()}</td>
-                                        <td>{new Date(b.endAt).toLocaleDateString()} à {new Date(b.createdAt).toLocaleTimeString()}</td>
-                                        <td>{b.user.firstname} {b.user.lastname}</td>
-                                        <td>{b.device.ref}</td>
-                                        <td>{b.briefing}</td>
-                                        <td>{b.oncall !== null ? "Oui" : "Non"}</td>
-                                    </tr>
-                                )
-                            })
-                        }
-                    </tbody>
-                </table>
-            }
+                    <div className="grid grid-cols-1 gap-3">
 
-            {
-                showCreateBr &&
+                        <div>
+                            <label className="text-sm font-medium text-gray-600">Appareil</label>
+                            <input type="text" list="devices" 
+                                className="w-full border rounded p-2"
+                                onChange={(e) => setDevice(e.target.value)} 
+                            />
+                        </div>
 
-                <div>
-                    <label htmlFor="">Appareil</label>
-                    <input type="text" list="devices" onChange={(e) => setDevice(e.target.value)} />
+                        <div>
+                            <label className="text-sm font-medium text-gray-600">Technicien</label>
+                            <input type="text" list="techs" 
+                                className="w-full border rounded p-2"
+                                onChange={(e) => setTech(e.target.value)} 
+                            />
+                        </div>
 
-                    <label htmlFor="">Technicien</label>
-                    <input type="text" list="techs" onChange={(e) => setTech(e.target.value)} />
+                        <div>
+                            <label className="text-sm font-medium text-gray-600">Description</label>
+                            <textarea 
+                                className="w-full border rounded p-2"
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                        </div>
 
-                    <label htmlFor="">Description</label>
-                    <input type="textarea" onChange={(e) => setDescription(e.target.value)} />
+                        <div>
+                            <label className="text-sm font-medium text-gray-600">Type de panne</label>
+                            <select 
+                                onChange={(e) => setType(e.target.value)}
+                                className="w-full border rounded p-2"
+                            >
+                                <option value="ASCBLQ">Ascenseur bloqué</option>
+                                <option value="ASCBRU">Ascenseur bruyant</option>
+                                <option value="PBETAG">Problème à un étage</option>
+                                <option value="OBJFOS">Objet en fosse</option>
+                                <option value="PERSBLQ">Personne(s) bloquée(s)</option>
+                            </select>
+                        </div>
 
-                    <label htmlFor="">Type de panne</label>
-                    <select name="" id="" onChange={(e) => setType(e.target.value)}>
-                        <option value="ASCBLQ">Ascenseur bloqué</option>
-                        <option value="ASCBRU">Ascenseur bruyant</option>
-                        <option value="PBETAG">Problème à un étage</option>
-                        <option value="OBJFOS">Objet en fosse</option>
-                        <option value="PERSBLQ">Personne(s) bloquée(s)</option>
-                    </select>
+                        <div className="flex gap-3 mt-4">
+                            <button 
+                                onClick={createBreakDown}
+                                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            >
+                                Valider
+                            </button>
 
-                    <button className="hover:cursor-pointer" onClick={createBreakDown}>Valider</button>
-                    <button className="hover:cursor-pointer" onClick={() => setShowCreateBr(false)}>Annuler</button>
+                            <button 
+                                onClick={() => setShowCreateBr(false)}
+                                className="flex-1 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+                            >
+                                Annuler
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            }
+            )}
 
-            {
-                message !== "" &&
-
-                <div>
-                    <div>{message}</div>
-                    <button className="hover:cursor-pointer" onClick={() => setMessage("")}>OK</button>
+            {/* MESSAGE MODAL */}
+            {message !== "" && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="bg-white rounded-lg shadow p-6 text-center space-y-4 max-w-sm">
+                        <p>{message}</p>
+                        <button 
+                            onClick={() =>
+                                {
+                                    setMessage("");
+                                    setShowCreateBr(false);
+                                }
+                            }
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        >
+                            OK
+                        </button>
+                    </div>
                 </div>
-            }
-        </>
-    )
+            )}
+        </div>
+    );
 }

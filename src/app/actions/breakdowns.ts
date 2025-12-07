@@ -52,7 +52,7 @@ export const getBreakdownsBySectorDB = async (sectorId: number) =>
     return breakdowns;
 }
 
-export const getBreakdownsByDeviceDB = async (ref: string) =>
+export const getBreakdownsByDeviceDB = async (param: string) =>
 {
     const session = await getServerSession(authOptions);
 
@@ -66,7 +66,28 @@ export const getBreakdownsByDeviceDB = async (ref: string) =>
         return [];
     }
 
-    const device = (await prisma.device.findFirst({where: {ref}}));
+    let device = null;
+
+    if (!isNaN(Number(param)))
+    {
+        device = await prisma.device.findFirst({
+            where:
+            {
+                OR:
+                [
+                    { ref: param },
+                    { id: Number(param) }
+                ]
+            }
+        });
+    }
+    
+    else
+    {
+        device = await prisma.device.findFirst({
+            where: { ref: param }
+        });
+    }
 
     if(!device)
     {
