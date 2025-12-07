@@ -33,7 +33,7 @@ wss.on("connection", (ws) =>
 
             else
             {
-                client.ws.send(JSON.stringify({event: "new_breakdown", desc: parsed.desc, device: parsed.device, type: parsed.type}));
+                client.ws.send(JSON.stringify({...parsed}));
                 console.log("Panne envoyée");
             }
         }

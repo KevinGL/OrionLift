@@ -1,6 +1,6 @@
 "use client"
 
-import { connectSocket } from "@/lib/ws";
+import { connectSocket, getSocket } from "@/lib/ws";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -15,6 +15,18 @@ export const Navbar = () =>
         {
             connectSocket(session.data.user.id, session.data.user.role);
         }
+
+        const socket = getSocket();
+        
+        socket?.addEventListener("message", (event) =>
+        {
+            const parsed = JSON.parse(event.data);
+
+            if (parsed.event === "new_breakdown")
+            {
+                setNewBreakdown({...parsed});
+            }
+        });
     }, [session]);
     
     return (

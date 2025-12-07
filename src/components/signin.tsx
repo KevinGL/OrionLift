@@ -26,7 +26,7 @@ export default function SignIn()
         {
             const session = await getSession();
 
-            connectSocket(session?.user?.id, session?.user?.role);
+            //connectSocket(session?.user?.id, session?.user?.role);
 
             if (session?.user?.role === "admin") 
             {
