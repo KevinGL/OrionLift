@@ -7,10 +7,11 @@ import { ManageDevices } from "./devices";
 import { ManageOnCalls } from "./oncalls";
 import { ManageBreakdowns } from "./breakdowns";
 import { signOut } from "next-auth/react";
+import { Users, PersonStanding, Siren, PhoneForwarded, ArrowLeft, LogOut, Settings } from "lucide-react";
 
 export const MenuAdmin = () =>
 {
-    const [option, setOption] = useState<number>(1);
+    const [option, setOption] = useState<number>(0);
     const [open, setOpen] = useState<boolean>(false);
 
     const menuItems =
@@ -23,66 +24,79 @@ export const MenuAdmin = () =>
     ];
     
     return (
-        <div className="flex min-h-screen bg-gradient-to-br from-sky-100 to-blue-200">
-            
-            <aside className={`
-                bg-white shadow-md p-4 w-64 flex flex-col gap-4
-                fixed md:static inset-y-0 left-0 transform
-                ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-                transition-transform duration-300 z-50
-            `}>
-                <h2 className="text-xl font-semibold text-blue-600 mb-4">Admin</h2>
+        <div className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 p-6">
+            {
+                option === 0 &&
 
-                {menuItems.map(item => (
-                    <button
-                        key={item.id}
-                        onClick={() => { setOption(item.id); setOpen(false); }}
-                        className={`px-3 py-2 text-left rounded-md
-                            ${option === item.id 
-                                ? "bg-blue-500 text-white" 
-                                : "bg-gray-100 text-gray-700 hover:bg-blue-100"}
-                        `}
-                    >
-                        {item.label}
-                    </button>
-                ))}
+                <div className="max-w-xl mx-auto">
+                    <div className="grid grid-cols-2 gap-6">
+                        <button
+                            onClick={() => setOption(1)}
+                            className="flex flex-col items-center p-6 bg-white shadow-md rounded-xl hover:bg-blue-50 hover:shadow-lg transition"
+                        >
+                            <PersonStanding className="w-10 h-10 text-blue-600 mb-2" />
+                            <span className="text-gray-700 font-medium">Personnel</span>
+                        </button>
 
-                <button onClick={async () => await signOut()} className="px-3 py-2 text-left rounded-md bg-gray-100 text-gray-700 hover:bg-blue-100">
-                    Déconnexion
-                </button>
+                        <button
+                            onClick={() => setOption(2)}
+                            className="flex flex-col items-center p-6 bg-white shadow-md rounded-xl hover:bg-blue-50 hover:shadow-lg transition"
+                        >
+                            <Users className="w-10 h-10 text-red-600 mb-2" />
+                            <span className="text-gray-700 font-medium">Équipes</span>
+                        </button>
+
+                        <button
+                            onClick={() => setOption(3)}
+                            className="flex flex-col items-center p-6 bg-white shadow-md rounded-xl hover:bg-blue-50 hover:shadow-lg transition"
+                        >
+                            <Settings className="w-10 h-10 text-green-600 mb-2" />
+                            <span className="text-gray-700 font-medium">Appareils</span>
+                        </button>
+
+                        <button
+                            onClick={() => setOption(4)}
+                            className="flex flex-col items-center p-6 bg-white shadow-md rounded-xl hover:bg-blue-50 hover:shadow-lg transition"
+                        >
+                            <Siren className="w-10 h-10 text-indigo-600 mb-2" />
+                            <span className="text-gray-700 font-medium">Pannes</span>
+                        </button>
+
+                        <button
+                            onClick={() => setOption(5)}
+                            className="flex flex-col items-center p-6 bg-white shadow-md rounded-xl hover:bg-blue-50 hover:shadow-lg transition"
+                        >
+                            <PhoneForwarded className="w-10 h-10 text-orange-600 mb-2" />
+                            <span className="text-gray-700 font-medium">Astreintes</span>
+                        </button>
+
+                        <button
+                            onClick={async () => await signOut()}
+                            className="flex flex-col items-center p-6 bg-white shadow-md rounded-xl hover:bg-blue-50 hover:shadow-lg transition"
+                        >
+                            <LogOut className="w-10 h-10 text-purple-600 mb-2" />
+                            <span className="text-gray-700 font-medium">Déconnexion</span>
+                        </button>
+                    </div>
+                </div>
+            }
+
+            {
+                option > 0 &&
 
                 <button
-                    className="mt-auto bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-md"
                     onClick={() => setOption(0)}
+                    className="flex flex-col items-center p-6 bg-blue-500 text-white shadow-md rounded-xl hover:bg-blue-600 hover:shadow-lg transition"
                 >
                     Retour
                 </button>
-            </aside>
+            }
 
-            <button
-                className="md:hidden fixed top-4 left-4 bg-blue-500 text-white p-2 rounded-md shadow-md z-50"
-                onClick={() => setOpen(!open)}
-            >
-                ☰
-            </button>
-
-            <main className="flex-1 p-6 ml-0 md:ml-64">
-                
-                {
-                    option === 0 &&
-
-                    <div className="text-center mt-10 text-gray-500 text-lg">
-                        Choisissez une section dans le menu.
-                    </div>
-                }
-
-                {option === 1 && <ManageTechs />}
-                {option === 2 && <ManageTeams />}
-                {option === 3 && <ManageDevices />}
-                {option === 4 && <ManageBreakdowns />}
-                {option === 5 && <ManageOnCalls />}
-                
-            </main>
+            {option === 1 && <ManageTechs />}
+            {option === 2 && <ManageTeams />}
+            {option === 3 && <ManageDevices />}
+            {option === 4 && <ManageBreakdowns />}
+            {option === 5 && <ManageOnCalls />}                
         </div>
     );
 }
