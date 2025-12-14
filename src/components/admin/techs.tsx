@@ -3,7 +3,8 @@
 import { getSectorsDB } from "@/app/actions/sectors";
 import { getTeamsDB } from "@/app/actions/teams";
 import { addUser, getUsers } from "@/app/actions/Users";
-import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export const ManageTechs = () =>
 {
@@ -16,6 +17,8 @@ export const ManageTechs = () =>
     const [showForm, setShowForm] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const [teams, setTeams] = useState<any[]>([]);
+
+    const router = useRouter();
 
     useEffect(() =>
     {
@@ -122,7 +125,10 @@ export const ManageTechs = () =>
                                     <td className="px-4 py-2">{user.role}</td>
                                     <td className="px-4 py-2">{user.sectorRef ?? "-"}</td>
                                     <td className="px-4 py-2 flex gap-2">
-                                        <button className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm">
+                                        <button
+                                            className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm"
+                                            onClick={() => router.push(`/admin/activity/${user.id}`)}
+                                        >
                                             Activité
                                         </button>
                                         <button className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm">

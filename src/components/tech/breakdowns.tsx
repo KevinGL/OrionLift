@@ -1,5 +1,4 @@
 import { getBreakdownsByTechDB, setTaken } from "@/app/actions/breakdowns";
-import { getSocket } from "@/app/sockets/sockets";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -19,11 +18,14 @@ export const Breakdowns = () =>
         getBreakdowns();
     }, []);
 
-    const takeBreakdown = async (b: any) =>
+    const takeBreakdown = async (b: any, index: number) =>
     {
         if(await setTaken(b.id))
         {
-            router.push(`/breakdowns/${b.id}`);
+            const br = [...breakdowns];
+            br[index].takenAt = Date.now();
+            setBreakdowns(br);
+            setMessage(`Prise en charge effectuée le ${(new Date().toLocaleDateString())} à ${(new Date().toLocaleTimeString())}`);
         }
 
         else
@@ -47,7 +49,7 @@ export const Breakdowns = () =>
 
                 <tbody>
                     {
-                        breakdowns.map((b: any) =>
+                        breakdowns.map((b: any, index: number) =>
                         {
                             return (
                                 <tr key={b.id}>
@@ -83,7 +85,7 @@ export const Breakdowns = () =>
                                         {
                                             !b.takenAt &&
 
-                                            <button className="hover:cursor-pointer" onClick={() => takeBreakdown(b)}>Prendre en charge</button>
+                                            <button className="hover:cursor-pointer" onClick={() => takeBreakdown(b, index)}>Prendre en charge</button>
                                         }
 
                                         {

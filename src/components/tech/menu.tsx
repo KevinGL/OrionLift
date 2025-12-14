@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Wrench, AlertTriangle, Calendar, PhoneForwarded, ArrowLeft, LogOut } from "lucide-react";
-import { Maintenances } from "@/components/maintenances";
+import { Maintenances } from "@/components/tech/maintenances";
 import { Breakdowns } from "./breakdowns";
 import { signOut } from "next-auth/react";
 

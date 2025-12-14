@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
+import { main } from "../../../prisma/seed";
 
 export const getUsers = async () =>
 {
@@ -117,4 +118,121 @@ export const getTechsDB = async () =>
     });
 
     return users;
+}
+
+export const getActivityByTech = async (userId: number) =>
+{
+    const session = await getServerSession(authOptions);
+
+    if(!session)
+    {
+        return [];
+    }
+
+    if(session.user?.role !== "admin")
+    {
+        return [];
+    }
+    
+    const breakdowns = await prisma.breakdown.findMany({
+        where:
+        {
+            userId
+        },
+
+        include:
+        {
+            device: true
+        }
+    });
+    
+    const maintenances = await prisma.maintenance.findMany({
+        where:
+        {
+            userId
+        },
+
+        include:
+        {
+            device: true
+        }
+    });
+
+    /////////////////////////////////////////////////////////////////////////////
+
+    const events: any[] = [];
+
+    breakdowns.map((br: any) =>
+    {
+        if(br.takenAt && !br.beginAt && !br.endAt)
+        {
+            events.push({
+                date: br.takenAt,
+                type: "Prise en charge panne",
+                briefing: br.briefing,
+                location: `${br.device.address} ${br.device.zipCode} ${br.device.city}`
+            });
+        }
+    });
+
+    breakdowns.map((br: any) =>
+    {
+        if(br.beginAt && !br.endAt)
+        {
+            events.push({
+                date: br.beginAt,
+                type: "Début panne",
+                briefing: br.briefing,
+                location: `${br.device.address} ${br.device.zipCode} ${br.device.city}`
+            });
+        }
+    });
+
+    breakdowns.map((br: any) =>
+    {
+        if(br.endAt)
+        {
+            events.push({
+                date: br.endAt,
+                type: "Fin panne",
+                briefing: br.briefing,
+                location: `${br.device.address} ${br.device.zipCode} ${br.device.city}`
+            });
+        }
+    });
+
+    /////////////////////////////////////////////////////////////////////////////
+
+    maintenances.map((br: any) =>
+    {
+        if(br.beginAt && !br.endAt)
+        {
+            events.push({
+                date: br.beginAt,
+                type: "Début maintenance",
+                briefing: br.briefing,
+                location: `${br.device.address} ${br.device.zipCode} ${br.device.city}`
+            });
+        }
+    });
+
+    maintenances.map((br: any) =>
+    {
+        if(br.endAt)
+        {
+            events.push({
+                date: br.endAt,
+                type: "Fin maintenance",
+                briefing: br.briefing,
+                location: `${br.device.address} ${br.device.zipCode} ${br.device.city}`
+            });
+        }
+    });
+
+    events.sort((a: any, b: any) =>
+    {
+        return a.date.getTime() <= b.date.getTime() ? 1 : -1;
+    });
+
+    return events;
 }
