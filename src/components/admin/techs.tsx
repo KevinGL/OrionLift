@@ -125,12 +125,14 @@ export const ManageTechs = () =>
                                     <td className="px-4 py-2">{user.role}</td>
                                     <td className="px-4 py-2">{user.sectorRef ?? "-"}</td>
                                     <td className="px-4 py-2 flex gap-2">
-                                        <button
+                                        
+                                         <button
                                             className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm"
-                                            onClick={() => router.push(`/admin/activity/${user.id}`)}
+                                            onClick={() => router.push(`/admin/activity/${user.id}/1`)}
                                         >
                                             Activité
                                         </button>
+                                        
                                         <button className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm">
                                             Supprimer
                                         </button>

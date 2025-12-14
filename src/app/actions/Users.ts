@@ -4,7 +4,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
-import { main } from "../../../prisma/seed";
 
 export const getUsers = async () =>
 {
@@ -120,18 +119,18 @@ export const getTechsDB = async () =>
     return users;
 }
 
-export const getActivityByTech = async (userId: number) =>
+export const getActivityByTech = async (userId: number, page: number) =>
 {
     const session = await getServerSession(authOptions);
 
     if(!session)
     {
-        return [];
+        return null;
     }
 
     if(session.user?.role !== "admin")
     {
-        return [];
+        return null;
     }
     
     const breakdowns = await prisma.breakdown.findMany({
@@ -234,5 +233,12 @@ export const getActivityByTech = async (userId: number) =>
         return a.date.getTime() <= b.date.getTime() ? 1 : -1;
     });
 
-    return events;
+    const sizePage: number = 20;
+    const nbPages: number = Math.floor(events.length / sizePage) + 1;
+    const offset: number = (page - 1) * sizePage;
+
+    return {
+        results: events.slice(offset, offset + sizePage),
+        nbPages
+    };
 }
