@@ -85,7 +85,8 @@ export const MenuTech = () =>
             )}
 
             {/* Pannes */}
-            {option === 2 && (
+            {option === 2 &&
+            (
                 <div className="max-w-3xl mx-auto">
                     <Breakdowns />
                     <button

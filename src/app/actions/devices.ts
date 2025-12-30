@@ -20,7 +20,7 @@ export const getDevicesByUser = async () =>
     });
 
     const devices: any[] = await prisma.device.findMany({
-        where : { sector: sector }
+        where : { sector }
     });
 
     const devicesUpdated = await Promise.all(devices.map(async (device) =>

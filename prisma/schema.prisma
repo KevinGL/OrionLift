@@ -30,6 +30,7 @@ model User {
   breakdowns      Breakdown[]
   interventions   Intervention[]
   onCalls         OnCall[]
+  tokens          Token[]
 }
 
 model Device {
@@ -44,6 +45,7 @@ model Device {
   maintenances    Maintenance[]
   breakdowns      Breakdown[]
   interventions   Intervention[]
+  tokens          Token[]
 }
 
 model Sector {
@@ -113,4 +115,14 @@ model OnCall {
   beginAt     DateTime @db.Date
   endAt       DateTime @db.Date
   breakdowns  Breakdown[]
+}
+
+model Token {
+  id          Int     @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  deviceId    Int
+  device      Device      @relation(fields: [deviceId], references: [id])
+  token       String
+  expiresAt   DateTime
 }

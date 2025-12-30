@@ -1,11 +1,17 @@
 "use client"
 
 import { getDevicesByUser } from "@/app/actions/devices";
+import { createMaintenanceToken } from "@/app/actions/tokens";
+import { encrypt } from "@/lib/crypt";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
 
 export const Maintenances = () =>
 {
     const [devices, setDevices] = useState<any[]>([]);
+    const router = useRouter();
+    const session = useSession();
 
     useEffect(() =>
     {
@@ -16,6 +22,13 @@ export const Maintenances = () =>
 
         getDevices();
     }, []);
+
+    const handleNewMaintenance = async (deviceId: number) =>
+    {
+        const token: string = await createMaintenanceToken(deviceId);
+        //console.log(token);
+        router.push("maintenances/new/" + token);
+    }
 
     return (
         <>
@@ -80,7 +93,7 @@ export const Maintenances = () =>
                                     <td>{ new Date(device.createdAt).toLocaleDateString() }</td>
                                     <td>{ device.address } { device.zipCode } { device.city }</td>
                                     <td className={color}>{ device.lastVisit ? nextVisit.toLocaleDateString() : "N/A" }</td>
-                                    <td><button className="hover:cursor-pointer">Traiter la maintenance</button></td>
+                                    <td><button className="hover:cursor-pointer" onClick={() => handleNewMaintenance(device.id)}>Traiter la maintenance</button></td>
                                 </tr>
                             )
                         })
