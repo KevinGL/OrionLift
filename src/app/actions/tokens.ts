@@ -51,7 +51,7 @@ export const getDeviceByToken = async (token: string) =>
 
     //console.log(dataToken);
 
-    if(dataToken.expiresAt.getTime() < Date.now())
+    if(!dataToken || dataToken.expiresAt.getTime() < Date.now())
     {
         console.log("Forbidden : token expired");
         return null;

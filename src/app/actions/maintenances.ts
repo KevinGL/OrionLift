@@ -15,7 +15,7 @@ export const addMaintenance = async (maint: any) =>
 
     const userId: number = session?.user?.id;
 
-    console.log(maint);
+    //console.log(maint);
 
     maint.userId = userId;
     maint.beginAt = maint.beginAt === "" ? new Date(Date.now()) : new Date(maint.beginAt);
